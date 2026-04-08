@@ -1,10 +1,10 @@
 package userservice.service.impl;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,15 +27,13 @@ import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+
     @Mock
     private UserDao userDao;
 
+    @InjectMocks
     private UserServiceImpl userService;
 
-    @BeforeEach
-    void setUp() {
-        userService = new UserServiceImpl(userDao);
-    }
 
     @Test
     void createUserShouldSaveValidatedUser() {
