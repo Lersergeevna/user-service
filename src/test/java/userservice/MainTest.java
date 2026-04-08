@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import userservice.config.DatabaseMigrator;
 import userservice.config.HibernateUtil;
 import userservice.constants.Messages;
@@ -15,7 +16,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 class MainTest {
 
@@ -28,18 +28,18 @@ class MainTest {
 
     @Test
     void main_shouldRunApplicationSuccessfully() {
-        try (MockedStatic<DatabaseMigrator> migratorMock = mockStatic(DatabaseMigrator.class);
-             MockedStatic<HibernateUtil> hibernateMock = mockStatic(HibernateUtil.class);
-             MockedConstruction<ConsoleApp> appConstruction = mockConstruction(ConsoleApp.class)) {
+        try (MockedStatic<DatabaseMigrator> migratorMock = Mockito.mockStatic(DatabaseMigrator.class);
+             MockedStatic<HibernateUtil> hibernateMock = Mockito.mockStatic(HibernateUtil.class);
+             MockedConstruction<ConsoleApp> appConstruction = Mockito.mockConstruction(ConsoleApp.class)) {
 
-            SessionFactory sessionFactory = mock(SessionFactory.class);
+            SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
             hibernateMock.when(HibernateUtil::getSessionFactory).thenReturn(sessionFactory);
 
             Main.main(new String[0]);
 
             migratorMock.verify(DatabaseMigrator::migrate);
             hibernateMock.verify(HibernateUtil::getSessionFactory);
-            verify(appConstruction.constructed().get(0)).run();
+            Mockito.verify(appConstruction.constructed().get(0)).run();
             hibernateMock.verify(HibernateUtil::shutdown);
         }
     }
@@ -49,8 +49,8 @@ class MainTest {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
         System.setErr(new PrintStream(err, true, StandardCharsets.UTF_8));
 
-        try (MockedStatic<DatabaseMigrator> migratorMock = mockStatic(DatabaseMigrator.class);
-             MockedStatic<HibernateUtil> hibernateMock = mockStatic(HibernateUtil.class)) {
+        try (MockedStatic<DatabaseMigrator> migratorMock = Mockito.mockStatic(DatabaseMigrator.class);
+             MockedStatic<HibernateUtil> hibernateMock = Mockito.mockStatic(HibernateUtil.class)) {
 
             migratorMock.when(DatabaseMigrator::migrate)
                     .thenThrow(new RuntimeException("startup failed"));

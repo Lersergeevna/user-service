@@ -1,6 +1,7 @@
 package userservice.util;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import userservice.constants.Messages;
 
@@ -8,8 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class InputReaderTest {
 
@@ -27,7 +26,7 @@ class InputReaderTest {
         setInput("   Alice   \n");
 
         try (InputReader reader = new InputReader()) {
-            assertEquals("Alice", reader.readNonBlank("Введите имя: "));
+            Assertions.assertEquals("Alice", reader.readNonBlank("Введите имя: "));
         }
     }
 
@@ -37,10 +36,10 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertEquals("Bob", reader.readNonBlank("Введите имя: "));
+            Assertions.assertEquals("Bob", reader.readNonBlank("Введите имя: "));
         }
 
-        assertTrue(output(out).contains(Messages.formatError(Messages.EMPTY_VALUE)));
+        Assertions.assertTrue(output(out).contains(Messages.formatError(Messages.EMPTY_VALUE)));
     }
 
     @Test
@@ -48,7 +47,7 @@ class InputReaderTest {
         setInput("test@example.com\n");
 
         try (InputReader reader = new InputReader()) {
-            assertEquals("test@example.com", reader.readEmail("Введите e-mail: "));
+            Assertions.assertEquals("test@example.com", reader.readEmail("Введите e-mail: "));
         }
     }
 
@@ -58,10 +57,10 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertEquals("user@mail.com", reader.readEmail("Введите e-mail: "));
+            Assertions.assertEquals("user@mail.com", reader.readEmail("Введите e-mail: "));
         }
 
-        assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_EMAIL)));
+        Assertions.assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_EMAIL)));
     }
 
     @Test
@@ -69,7 +68,7 @@ class InputReaderTest {
         setInput("25\n");
 
         try (InputReader reader = new InputReader()) {
-            assertEquals(25, reader.readAge("Введите возраст: "));
+            Assertions.assertEquals(25, reader.readAge("Введите возраст: "));
         }
     }
 
@@ -79,10 +78,10 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertEquals(30, reader.readAge("Введите возраст: "));
+            Assertions.assertEquals(30, reader.readAge("Введите возраст: "));
         }
 
-        assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_INT)));
+        Assertions.assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_INT)));
     }
 
     @Test
@@ -91,10 +90,10 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertEquals(18, reader.readAge("Введите возраст: "));
+            Assertions.assertEquals(18, reader.readAge("Введите возраст: "));
         }
 
-        assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_AGE)));
+        Assertions.assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_AGE)));
     }
 
     @Test
@@ -102,7 +101,7 @@ class InputReaderTest {
         setInput("15\n");
 
         try (InputReader reader = new InputReader()) {
-            assertEquals(15L, reader.readPositiveId("Введите id: "));
+            Assertions.assertEquals(15L, reader.readPositiveId("Введите id: "));
         }
     }
 
@@ -112,12 +111,12 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertEquals(10L, reader.readPositiveId("Введите id: "));
+            Assertions.assertEquals(10L, reader.readPositiveId("Введите id: "));
         }
 
         String output = output(out);
-        assertTrue(output.contains(Messages.formatError(Messages.INVALID_ID)));
-        assertTrue(output.contains(Messages.formatError(Messages.INVALID_ENTITY_ID)));
+        Assertions.assertTrue(output.contains(Messages.formatError(Messages.INVALID_ID)));
+        Assertions.assertTrue(output.contains(Messages.formatError(Messages.INVALID_ENTITY_ID)));
     }
 
     @Test
@@ -125,7 +124,7 @@ class InputReaderTest {
         setInput("y\n");
 
         try (InputReader reader = new InputReader()) {
-            assertTrue(reader.readConfirmation("Подтвердите: "));
+            Assertions.assertTrue(reader.readConfirmation("Подтвердите: "));
         }
     }
 
@@ -134,7 +133,7 @@ class InputReaderTest {
         setInput("n\n");
 
         try (InputReader reader = new InputReader()) {
-            assertFalse(reader.readConfirmation("Подтвердите: "));
+            Assertions.assertFalse(reader.readConfirmation("Подтвердите: "));
         }
     }
 
@@ -144,10 +143,10 @@ class InputReaderTest {
         ByteArrayOutputStream out = captureOutput();
 
         try (InputReader reader = new InputReader()) {
-            assertFalse(reader.readConfirmation("Подтвердите: "));
+            Assertions.assertFalse(reader.readConfirmation("Подтвердите: "));
         }
 
-        assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_CONFIRMATION)));
+        Assertions.assertTrue(output(out).contains(Messages.formatError(Messages.INVALID_CONFIRMATION)));
     }
 
     private void setInput(String input) {

@@ -1,17 +1,16 @@
 package userservice.util;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ExceptionUtilsTest {
 
     @Test
     void isConstraintViolation_shouldReturnFalseForNull() {
-        assertFalse(ExceptionUtils.isConstraintViolation(null));
+        Assertions.assertFalse(ExceptionUtils.isConstraintViolation(null));
     }
 
     @Test
@@ -19,7 +18,7 @@ class ExceptionUtilsTest {
         ConstraintViolationException exception =
                 new ConstraintViolationException("constraint", new SQLException("sql"), "insert");
 
-        assertTrue(ExceptionUtils.isConstraintViolation(exception));
+        Assertions.assertTrue(ExceptionUtils.isConstraintViolation(exception));
     }
 
     @Test
@@ -28,7 +27,7 @@ class ExceptionUtilsTest {
                 new ConstraintViolationException("constraint", new SQLException("sql"), "insert");
         RuntimeException wrapped = new RuntimeException(new IllegalStateException(root));
 
-        assertTrue(ExceptionUtils.isConstraintViolation(wrapped));
+        Assertions.assertTrue(ExceptionUtils.isConstraintViolation(wrapped));
     }
 
     @Test
@@ -39,6 +38,6 @@ class ExceptionUtilsTest {
                 )
         );
 
-        assertFalse(ExceptionUtils.isConstraintViolation(exception));
+        Assertions.assertFalse(ExceptionUtils.isConstraintViolation(exception));
     }
 }

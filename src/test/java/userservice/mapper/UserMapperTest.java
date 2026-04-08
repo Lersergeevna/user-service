@@ -1,5 +1,6 @@
 package userservice.mapper;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import userservice.dto.UserCreateRequest;
 import userservice.dto.UserUpdateRequest;
@@ -7,17 +8,15 @@ import userservice.entity.UserEntity;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class UserMapperTest {
 
     @Test
     void toEntityShouldCreateNewUserEntity() {
         UserEntity user = UserMapper.toEntity(new UserCreateRequest("Alice", "alice@example.com", 25));
 
-        assertEquals("Alice", user.getName());
-        assertEquals("alice@example.com", user.getEmail());
-        assertEquals(25, user.getAge());
+        Assertions.assertEquals("Alice", user.getName());
+        Assertions.assertEquals("alice@example.com", user.getEmail());
+        Assertions.assertEquals(25, user.getAge());
     }
 
     @Test
@@ -30,10 +29,10 @@ class UserMapperTest {
         UserEntity updated = UserMapper.applyUpdate(existing,
                 new UserUpdateRequest(7L, "Bob", "bob@example.com", 30));
 
-        assertSame(existing, updated);
-        assertEquals("Bob", updated.getName());
-        assertEquals("bob@example.com", updated.getEmail());
-        assertEquals(30, updated.getAge());
-        assertEquals(7L, updated.getId());
+        Assertions.assertSame(existing, updated);
+        Assertions.assertEquals("Bob", updated.getName());
+        Assertions.assertEquals("bob@example.com", updated.getEmail());
+        Assertions.assertEquals(30, updated.getAge());
+        Assertions.assertEquals(7L, updated.getId());
     }
 }

@@ -1,9 +1,6 @@
 package userservice.dao.impl;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -15,8 +12,6 @@ import userservice.exception.DataAccessException;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 class UserDaoImplIntegrationTest {
@@ -62,13 +57,13 @@ class UserDaoImplIntegrationTest {
         Long id = userDao.save(user);
         Optional<UserEntity> found = userDao.findById(id);
 
-        assertAll(
-                () -> assertNotNull(id),
-                () -> assertTrue(found.isPresent()),
-                () -> assertEquals("Alice", found.orElseThrow().getName()),
-                () -> assertEquals("alice@example.com", found.orElseThrow().getEmail()),
-                () -> assertEquals(25, found.orElseThrow().getAge()),
-                () -> assertNotNull(found.orElseThrow().getCreatedAt())
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(id),
+                () -> Assertions.assertTrue(found.isPresent()),
+                () -> Assertions.assertEquals("Alice", found.orElseThrow().getName()),
+                () -> Assertions.assertEquals("alice@example.com", found.orElseThrow().getEmail()),
+                () -> Assertions.assertEquals(25, found.orElseThrow().getAge()),
+                () -> Assertions.assertNotNull(found.orElseThrow().getCreatedAt())
         );
     }
 
@@ -76,19 +71,19 @@ class UserDaoImplIntegrationTest {
     void saveShouldThrowDataAccessExceptionForDuplicateEmail() {
         userDao.save(new UserEntity("Alice", "alice@example.com", 25));
 
-        DataAccessException exception = assertThrows(
+        DataAccessException exception = Assertions.assertThrows(
                 DataAccessException.class,
                 () -> userDao.save(new UserEntity("Bob", "alice@example.com", 30))
         );
 
-        assertEquals(Messages.DB_CONSTRAINT_FAILED, exception.getMessage());
+        Assertions.assertEquals(Messages.DB_CONSTRAINT_FAILED, exception.getMessage());
     }
 
     @Test
     void findByIdShouldReturnEmptyWhenUserMissing() {
         Optional<UserEntity> found = userDao.findById(999L);
 
-        assertTrue(found.isEmpty());
+        Assertions.assertTrue(found.isEmpty());
     }
 
     @Test
@@ -97,15 +92,15 @@ class UserDaoImplIntegrationTest {
 
         Optional<UserEntity> found = userDao.findByEmail("bob@example.com");
 
-        assertTrue(found.isPresent());
-        assertEquals("Bob", found.orElseThrow().getName());
+        Assertions.assertTrue(found.isPresent());
+        Assertions.assertEquals("Bob", found.orElseThrow().getName());
     }
 
     @Test
     void findByEmailShouldReturnEmptyWhenUserMissing() {
         Optional<UserEntity> found = userDao.findByEmail("missing@example.com");
 
-        assertTrue(found.isEmpty());
+        Assertions.assertTrue(found.isEmpty());
     }
 
     @Test
@@ -115,23 +110,23 @@ class UserDaoImplIntegrationTest {
 
         List<UserEntity> users = userDao.findAll();
 
-        assertEquals(2, users.size());
-        assertEquals(List.of(firstId, secondId), users.stream().map(UserEntity::getId).toList());
+        Assertions.assertEquals(2, users.size());
+        Assertions.assertEquals(List.of(firstId, secondId), users.stream().map(UserEntity::getId).toList());
     }
 
     @Test
     void countShouldReturnZeroForEmptyDatabase() {
-        assertEquals(0L, userDao.count());
+        Assertions.assertEquals(0L, userDao.count());
     }
 
     @Test
     void countAndExistsByIdShouldReflectDatabaseState() {
         Long id = userDao.save(new UserEntity("Alice", "alice@example.com", 25));
 
-        assertAll(
-                () -> assertEquals(1L, userDao.count()),
-                () -> assertTrue(userDao.existsById(id)),
-                () -> assertFalse(userDao.existsById(id + 1))
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1L, userDao.count()),
+                () -> Assertions.assertTrue(userDao.existsById(id)),
+                () -> Assertions.assertFalse(userDao.existsById(id + 1))
         );
     }
 
@@ -146,11 +141,11 @@ class UserDaoImplIntegrationTest {
 
         UserEntity updated = userDao.update(persisted);
 
-        assertAll(
-                () -> assertEquals("Alice Updated", updated.getName()),
-                () -> assertEquals("updated@example.com", updated.getEmail()),
-                () -> assertEquals(26, updated.getAge()),
-                () -> assertEquals("updated@example.com", userDao.findById(id).orElseThrow().getEmail())
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Alice Updated", updated.getName()),
+                () -> Assertions.assertEquals("updated@example.com", updated.getEmail()),
+                () -> Assertions.assertEquals(26, updated.getAge()),
+                () -> Assertions.assertEquals("updated@example.com", userDao.findById(id).orElseThrow().getEmail())
         );
     }
 
@@ -162,12 +157,12 @@ class UserDaoImplIntegrationTest {
         UserEntity firstUser = userDao.findById(firstId).orElseThrow();
         firstUser.setEmail("bob@example.com");
 
-        DataAccessException exception = assertThrows(
+        DataAccessException exception = Assertions.assertThrows(
                 DataAccessException.class,
                 () -> userDao.update(firstUser)
         );
 
-        assertEquals(Messages.DB_CONSTRAINT_FAILED, exception.getMessage());
+        Assertions.assertEquals(Messages.DB_CONSTRAINT_FAILED, exception.getMessage());
     }
 
     @Test
@@ -176,15 +171,15 @@ class UserDaoImplIntegrationTest {
 
         boolean deleted = userDao.deleteById(id);
 
-        assertAll(
-                () -> assertTrue(deleted),
-                () -> assertTrue(userDao.findById(id).isEmpty()),
-                () -> assertEquals(0L, userDao.count())
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(deleted),
+                () -> Assertions.assertTrue(userDao.findById(id).isEmpty()),
+                () -> Assertions.assertEquals(0L, userDao.count())
         );
     }
 
     @Test
     void deleteByIdShouldReturnFalseWhenUserMissing() {
-        assertFalse(userDao.deleteById(999L));
+        Assertions.assertFalse(userDao.deleteById(999L));
     }
 }

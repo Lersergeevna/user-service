@@ -2,7 +2,9 @@ package userservice.ui;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
 import userservice.constants.Messages;
 import userservice.dto.UserCreateRequest;
 import userservice.entity.UserEntity;
@@ -11,15 +13,9 @@ import userservice.exception.InvalidInputException;
 import userservice.service.impl.UserServiceImpl;
 import userservice.util.InputReader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.lang.reflect.Field;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 class ConsoleAppTest {
 
@@ -33,12 +29,12 @@ class ConsoleAppTest {
     @Test
     void run_shouldExitWhenExitCommandChosen() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class);
+                     Mockito.mockConstruction(UserServiceImpl.class);
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: ")).thenReturn("0");
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: ")).thenReturn("0");
                      })) {
 
             ConsoleApp app = new ConsoleApp();
@@ -47,22 +43,22 @@ class ConsoleAppTest {
             ConsolePrinter printer = printerConstruction.constructed().get(0);
             InputReader inputReader = inputReaderConstruction.constructed().get(0);
 
-            verify(printer).printHeader();
-            verify(printer, atLeastOnce()).printMenu();
-            verify(printer).printInfo(Messages.EXIT);
-            verify(inputReader).close();
+            Mockito.verify(printer).printHeader();
+            Mockito.verify(printer, Mockito.atLeastOnce()).printMenu();
+            Mockito.verify(printer).printInfo(Messages.EXIT);
+            Mockito.verify(inputReader).close();
         }
     }
 
     @Test
     void run_shouldPrintErrorForInvalidMenuItemThenExit() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class);
+                     Mockito.mockConstruction(UserServiceImpl.class);
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("999", "0");
                      })) {
 
@@ -71,22 +67,22 @@ class ConsoleAppTest {
 
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(printer).printError(Messages.INVALID_MENU_ITEM);
-            verify(printer).printInfo(Messages.EXIT);
+            Mockito.verify(printer).printError(Messages.INVALID_MENU_ITEM);
+            Mockito.verify(printer).printInfo(Messages.EXIT);
         }
     }
 
     @Test
     void run_shouldBlockActionWhenUsersDoNotExist() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.hasUsers()).thenReturn(false);
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.hasUsers()).thenReturn(false);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("3", "0");
                      })) {
 
@@ -95,30 +91,30 @@ class ConsoleAppTest {
 
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(printer).printError(
+            Mockito.verify(printer).printError(
                     Messages.NO_USERS_FOR_COMMAND.formatted(MenuAction.GET_ALL.description())
             );
-            verify(printer).printInfo(Messages.EXIT);
+            Mockito.verify(printer).printInfo(Messages.EXIT);
         }
     }
 
     @Test
     void run_shouldCreateUserSuccessfully() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.createUser(any(UserCreateRequest.class))).thenReturn(5L);
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.createUser(ArgumentMatchers.any(UserCreateRequest.class))).thenReturn(5L);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("1", "0");
-                         when(mock.readNonBlank("Введите имя: "))
+                         Mockito.when(mock.readNonBlank("Введите имя: "))
                                  .thenReturn("Alice");
-                         when(mock.readEmail("Введите e-mail: "))
+                         Mockito.when(mock.readEmail("Введите e-mail: "))
                                  .thenReturn("alice@example.com");
-                         when(mock.readAge("Введите возраст: "))
+                         Mockito.when(mock.readAge("Введите возраст: "))
                                  .thenReturn(25);
                      })) {
 
@@ -128,33 +124,33 @@ class ConsoleAppTest {
             UserServiceImpl userService = userServiceConstruction.constructed().get(0);
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(userService).ensureEmailAvailable("alice@example.com", null);
-            verify(userService).createUser(any(UserCreateRequest.class));
-            verify(printer).printSuccess(Messages.USER_CREATED.formatted(5L));
-            verify(printer).printInfo(Messages.EXIT);
+            Mockito.verify(userService).ensureEmailAvailable("alice@example.com", null);
+            Mockito.verify(userService).createUser(ArgumentMatchers.any(UserCreateRequest.class));
+            Mockito.verify(printer).printSuccess(Messages.USER_CREATED.formatted(5L));
+            Mockito.verify(printer).printInfo(Messages.EXIT);
         }
     }
 
     @Test
     void run_shouldRepeatUntilEmailBecomesAvailable() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         doThrow(new InvalidInputException(Messages.DUPLICATE_EMAIL))
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.doThrow(new InvalidInputException(Messages.DUPLICATE_EMAIL))
                                  .doNothing()
-                                 .when(mock).ensureEmailAvailable(anyString(), isNull());
-                         when(mock.createUser(any(UserCreateRequest.class))).thenReturn(7L);
+                                 .when(mock).ensureEmailAvailable(ArgumentMatchers.anyString(), ArgumentMatchers.isNull());
+                         Mockito.when(mock.createUser(ArgumentMatchers.any(UserCreateRequest.class))).thenReturn(7L);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("1", "0");
-                         when(mock.readNonBlank("Введите имя: "))
+                         Mockito.when(mock.readNonBlank("Введите имя: "))
                                  .thenReturn("Bob");
-                         when(mock.readEmail("Введите e-mail: "))
+                         Mockito.when(mock.readEmail("Введите e-mail: "))
                                  .thenReturn("dup@mail.com", "ok@mail.com");
-                         when(mock.readAge("Введите возраст: "))
+                         Mockito.when(mock.readAge("Введите возраст: "))
                                  .thenReturn(30);
                      })) {
 
@@ -164,9 +160,9 @@ class ConsoleAppTest {
             UserServiceImpl userService = userServiceConstruction.constructed().get(0);
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(userService, times(2)).ensureEmailAvailable(anyString(), isNull());
-            verify(printer).printError(Messages.DUPLICATE_EMAIL);
-            verify(printer).printSuccess(Messages.USER_CREATED.formatted(7L));
+            Mockito.verify(userService, Mockito.times(2)).ensureEmailAvailable(ArgumentMatchers.anyString(), ArgumentMatchers.isNull());
+            Mockito.verify(printer).printError(Messages.DUPLICATE_EMAIL);
+            Mockito.verify(printer).printSuccess(Messages.USER_CREATED.formatted(7L));
         }
     }
 
@@ -176,20 +172,20 @@ class ConsoleAppTest {
                 LocalDateTime.of(2026, 4, 3, 16, 0));
 
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.hasUsers()).thenReturn(true);
-                         doThrow(new EntityNotFoundException(Messages.USER_NOT_FOUND_BY_ID.formatted(1L)))
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.hasUsers()).thenReturn(true);
+                         Mockito.doThrow(new EntityNotFoundException(Messages.USER_NOT_FOUND_BY_ID.formatted(1L)))
                                  .doNothing()
-                                 .when(mock).ensureUserExists(anyLong());
-                         when(mock.getUserById(2L)).thenReturn(user);
+                                 .when(mock).ensureUserExists(ArgumentMatchers.anyLong());
+                         Mockito.when(mock.getUserById(2L)).thenReturn(user);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("2", "0");
-                         when(mock.readPositiveId("Введите id пользователя: "))
+                         Mockito.when(mock.readPositiveId("Введите id пользователя: "))
                                  .thenReturn(1L, 2L);
                      })) {
 
@@ -199,9 +195,9 @@ class ConsoleAppTest {
             UserServiceImpl userService = userServiceConstruction.constructed().get(0);
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(userService, times(2)).ensureUserExists(anyLong());
-            verify(printer).printError(Messages.USER_NOT_FOUND_BY_ID.formatted(1L));
-            verify(printer).printUser(user);
+            Mockito.verify(userService, Mockito.times(2)).ensureUserExists(ArgumentMatchers.anyLong());
+            Mockito.verify(printer).printError(Messages.USER_NOT_FOUND_BY_ID.formatted(1L));
+            Mockito.verify(printer).printUser(user);
         }
     }
 
@@ -211,15 +207,15 @@ class ConsoleAppTest {
                 LocalDateTime.of(2026, 4, 3, 17, 0));
 
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.hasUsers()).thenReturn(true);
-                         when(mock.getAllUsers()).thenReturn(java.util.List.of(user));
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.hasUsers()).thenReturn(true);
+                         Mockito.when(mock.getAllUsers()).thenReturn(java.util.List.of(user));
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("3", "0");
                      })) {
 
@@ -227,25 +223,25 @@ class ConsoleAppTest {
             app.run();
 
             ConsolePrinter printer = printerConstruction.constructed().get(0);
-            verify(printer).printUsers(java.util.List.of(user));
+            Mockito.verify(printer).printUsers(java.util.List.of(user));
         }
     }
 
     @Test
     void run_shouldCancelDeleteWhenUserDoesNotConfirm() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.hasUsers()).thenReturn(true);
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.hasUsers()).thenReturn(true);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("5", "0");
-                         when(mock.readPositiveId("Введите id пользователя для удаления: "))
+                         Mockito.when(mock.readPositiveId("Введите id пользователя для удаления: "))
                                  .thenReturn(10L);
-                         when(mock.readConfirmation("Подтвердите удаление (Y/N): "))
+                         Mockito.when(mock.readConfirmation("Подтвердите удаление (Y/N): "))
                                  .thenReturn(false);
                      })) {
 
@@ -255,27 +251,27 @@ class ConsoleAppTest {
             UserServiceImpl userService = userServiceConstruction.constructed().get(0);
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(userService).ensureUserExists(10L);
-            verify(userService, never()).deleteUser(anyLong());
-            verify(printer).printInfo(Messages.DELETE_CANCELLED);
+            Mockito.verify(userService).ensureUserExists(10L);
+            Mockito.verify(userService, Mockito.never()).deleteUser(ArgumentMatchers.anyLong());
+            Mockito.verify(printer).printInfo(Messages.DELETE_CANCELLED);
         }
     }
 
     @Test
     void run_shouldDeleteUserWhenConfirmed() {
         try (MockedConstruction<UserServiceImpl> userServiceConstruction =
-                     mockConstruction(UserServiceImpl.class, (mock, context) -> {
-                         when(mock.hasUsers()).thenReturn(true);
+                     Mockito.mockConstruction(UserServiceImpl.class, (mock, context) -> {
+                         Mockito.when(mock.hasUsers()).thenReturn(true);
                      });
              MockedConstruction<ConsolePrinter> printerConstruction =
-                     mockConstruction(ConsolePrinter.class);
+                     Mockito.mockConstruction(ConsolePrinter.class);
              MockedConstruction<InputReader> inputReaderConstruction =
-                     mockConstruction(InputReader.class, (mock, context) -> {
-                         when(mock.readNonBlank("Введите команду: "))
+                     Mockito.mockConstruction(InputReader.class, (mock, context) -> {
+                         Mockito.when(mock.readNonBlank("Введите команду: "))
                                  .thenReturn("5", "0");
-                         when(mock.readPositiveId("Введите id пользователя для удаления: "))
+                         Mockito.when(mock.readPositiveId("Введите id пользователя для удаления: "))
                                  .thenReturn(11L);
-                         when(mock.readConfirmation("Подтвердите удаление (Y/N): "))
+                         Mockito.when(mock.readConfirmation("Подтвердите удаление (Y/N): "))
                                  .thenReturn(true);
                      })) {
 
@@ -285,8 +281,8 @@ class ConsoleAppTest {
             UserServiceImpl userService = userServiceConstruction.constructed().get(0);
             ConsolePrinter printer = printerConstruction.constructed().get(0);
 
-            verify(userService).deleteUser(11L);
-            verify(printer).printSuccess(Messages.USER_DELETED);
+            Mockito.verify(userService).deleteUser(11L);
+            Mockito.verify(printer).printSuccess(Messages.USER_DELETED);
         }
     }
 
