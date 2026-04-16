@@ -27,10 +27,8 @@ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private UserRepository userRepository;
 
@@ -153,7 +151,7 @@ class UserControllerTest {
     void getUserById_shouldReturnBadRequestForInvalidId() throws Exception {
         mockMvc.perform(get("/api/users/{id}", 0))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("ID должен быть положительным числом."));
+                .andExpect(jsonPath("$.message").value("Некорректный id: 0. ID должен быть положительным числом."));
     }
 
     @Test
@@ -190,7 +188,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Validation failed."))
+                .andExpect(jsonPath("$.message").value("Ошибка валидации входных данных."))
                 .andExpect(jsonPath("$.details").isArray());
     }
 
